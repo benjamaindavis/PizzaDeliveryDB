@@ -25,7 +25,7 @@ public class Main extends Application {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection("jdbc:mysql://localhost/PizzaCustomer?user=root&password=toolbox&allowPublicKeyRetrieval=true");
-            //change conn later to what tom wanted
+            //change conn later to what tom wants
         } catch (SQLException ex) {
 // handle any errors
             System.out.println("SQLException: " + ex.getMessage());
