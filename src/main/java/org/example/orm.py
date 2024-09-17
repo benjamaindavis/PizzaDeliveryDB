@@ -16,11 +16,11 @@ class User(Base):
     birthday = Column(Date) # for discounts
     pizza_count = Column(Integer) # for discounts
 
-    def __repr__(self):
+    def __repr__(self): # for debugging
         return "<User(full_name='%s', username='%s', password='%s', birthday='%d', pizza_count='%i')>" % (
         self.name, self.username, self.password, self.birthday, self.pizza_count)
 
 
-#Base.metadata.create_all(engine)
+#Base.metadata.create_all(engine) put at the end
 
-#print(repr(User.__table__))
+#print(repr(User.__table__)) use this for debugging
