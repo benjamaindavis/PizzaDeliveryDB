@@ -1,26 +1,49 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Column, Integer, String, Date, insert, delete, DateTime
+from sqlalchemy.orm import declarative_base
+
+Base = declarative_base()
 engine = create_engine('mysql+pymysql://root:toolbox@127.0.0.1:3306/PizzaShop', echo=True)
 
-from sqlalchemy.orm import declarative_base
-Base = declarative_base()
-
-from sqlalchemy import Column, Integer, String, Date
-
-class User(Base):
-    __tablename__ = 'users'
+class Customer(Base): # DROP TABLE IF EXISTS, use later if new column is needed
+    __tablename__ = 'customers'
     
     id = Column(Integer, primary_key = True, autoincrement = True)
     full_name = Column(String(50))# identification...
-    username = Column(String(50))# login info
+    username = Column(String(50), unique = True)# login info
     password = Column(String(50))# login info
-    birthday = Column(Date) # for discounts
+    birthday = Column(DateTime) # for discounts
     pizza_count = Column(Integer) # for discounts
-
-    def __repr__(self): # for debugging
-        return "<User(full_name='%s', username='%s', password='%s', birthday='%d', pizza_count='%i')>" % (
-        self.name, self.username, self.password, self.birthday, self.pizza_count)
+    postal_code = Column(String(10)) # for data ig...
 
 
-#Base.metadata.create_all(engine) put at the end
+
+def insertCustomer (full_name:String, username:String, password:String, birthday:String, postal_code:String):
+    #add pass_hash later
+
+    #birthday_date = DateTime.strptime(birthday, '%Y-%m-%d').date()
+
+
+    with engine.connect() as conn:
+        conn.execute(insert(Customer).values(full_name = full_name, username = username, password = password, birthday = birthday, pizza_count = 0, postal_code = postal_code))
+        
+        conn.commit()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Base.metadata.create_all(engine)
 
 #print(repr(User.__table__)) use this for debugging
