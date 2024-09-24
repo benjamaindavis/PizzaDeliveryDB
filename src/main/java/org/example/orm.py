@@ -1,7 +1,8 @@
-from sqlalchemy import create_engine, Column, Integer, String, insert, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, insert, DateTime, select
 from sqlalchemy.types import Boolean
 from decimal import Decimal
 from sqlalchemy.orm import declarative_base
+import bcrypt
 
 Base = declarative_base()
 engine = create_engine('mysql+pymysql://root:toolbox@127.0.0.1:3306/PizzaShop', echo=True)
@@ -12,7 +13,7 @@ class Customer(Base): # DROP TABLE IF EXISTS, use later if new column is needed
     customer_id = Column(Integer, primary_key = True, autoincrement = True)
     full_name = Column(String(50))# identification...
     username = Column(String(50), unique = True)# login info
-    password = Column(String(50))# login info
+    password = Column(String(100))# LONGER FOR HASHING
     birthday = Column(DateTime) # for discounts
     pizza_count = Column(Integer) # for discounts
     postal_code = Column(String(10)) # for data ig...
@@ -44,24 +45,64 @@ class Ingredients(Base):
 
 class Order(Base):
     __tablename__ = 'order'
+# everything above is table creation
+#-----------------------------------------------------------------------------------------------------------------------
+# below are functions for the logic
 
+def hash_password(password: str) -> str:
+    hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    return hashed.decode('utf-8')
 
-
-def insertCustomer (full_name:String, username:String, password:String, birthday:String, postal_code:String):
-    #add pass_hash later
+def signUp (full_name:str, username:str, password:str, birthday:str, postal_code:str):
+    hashed_password = hash_password(password)
 
     with engine.connect() as conn:
-        conn.execute(insert(Customer).values(full_name = full_name, username = username, password = password, birthday = birthday, pizza_count = 0, postal_code = postal_code))
         
+        existing_user = conn.execute(
+            select(Customer).where(Customer.username == username)
+        ).fetchone()
+
+        if existing_user:
+            print("Username is taken!")
+            return None
+
+        # insert new customer
+        conn.execute(insert(Customer).values(
+            full_name = full_name,
+            username = username,
+            password = hashed_password,
+            birthday = birthday,
+            pizza_count = 0 ,  
+            postal_code = postal_code
+            )
+        )
+
         conn.commit()
+        print("Signup successful!")
 
-def applyDiscount(order):
-
-
-
-
+def verify_password(user_password: str, hashed_password: str) -> bool:
+    return bcrypt.checkpw(user_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 
+def login(username:str, password:str):
+     with engine.connect() as conn:
+        #fetch user by username
+        user_record = conn.execute(
+            select(Customer).where(Customer.username == username)
+        ).fetchone()
+
+        if user_record:
+            if verify_password(password, user_record.password):
+                print("Login successful!")
+                return user_record 
+            else:
+                print("Invalid password!")
+                return None
+        else:
+            print("User not found! Please create an account!")
+            return None
+
+#def applyDiscount(user, order):
 
 
 
@@ -74,6 +115,7 @@ def applyDiscount(order):
 
 
 
-Base.metadata.create_all(engine)
 
-#print(repr(User.__table__)) use this for debugging
+
+
+#Base.metadata.create_all(engine)
