@@ -1,53 +1,8 @@
-from sqlalchemy import create_engine, Column, Integer, String, insert, DateTime, select
-from sqlalchemy.types import Boolean
-from decimal import Decimal
-from sqlalchemy.orm import declarative_base
-import bcrypt, random
+from sqlalchemy import create_engine, insert, select, DateTime
+from tables import Base, Customer
+import bcrypt
 
-Base = declarative_base()
 engine = create_engine('mysql+pymysql://root:toolbox@127.0.0.1:3306/PizzaShop', echo=True)
-
-class Customer(Base): # DROP TABLE IF EXISTS, use later if new column is needed
-    __tablename__ = 'customers'
-    
-    customer_id = Column(Integer, primary_key = True, autoincrement = True)
-    full_name = Column(String(50))# identification...
-    username = Column(String(50), unique = True)# login info
-    password = Column(String(100))# LONGER FOR HASHING
-    birthday = Column(DateTime) # for discounts
-    pizza_count = Column(Integer) # for discounts
-    postal_code = Column(String(10)) # for data ig...
-
-class Discount(Base):
-    __tablename__ = 'discounts'
-
-    discount_id = Column(Integer, primary_key = True, autoincrement = True)
-    discount_code = Column(Integer)
-    discount_type = Column(String(10))
-
-class Pizza(Base):
-    __tablename__ = 'pizza'
-
-    pizza_id = Column(Integer, primary_key = True, autoincrement = True)
-    pizza_name = Column(String(50))
-    pizza_price = Column(Decimal(5,2))
-    vegetarian = Column(Boolean)
-    vegan = Column(Boolean)
-
-class Ingredients(Base):
-    __tablename__ = 'ingredients'
-
-    ingredient_id = Column(Integer, primary_key = True, autoincrement = True)
-    ingredient_name = Column(String(50))
-    ingredient_cost = Column(Decimal(5,2))
-    vegetarian = Column(Boolean)
-    vegan = Column(Boolean)
-
-class Order(Base):
-    __tablename__ = 'order'
-# everything above is table creation
-#-----------------------------------------------------------------------------------------------------------------------
-# below are functions for the logic
 
 def hash_password(password: str) -> str:
     hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -113,19 +68,3 @@ def check_birthday(birthday:DateTime):
         ).fetchone()
 
         if birthday_check:
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#Base.metadata.create_all(engine)
