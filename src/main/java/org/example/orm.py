@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, Column, Integer, String, insert, DateTime,
 from sqlalchemy.types import Boolean
 from decimal import Decimal
 from sqlalchemy.orm import declarative_base
-import bcrypt
+import bcrypt, random
 
 Base = declarative_base()
 engine = create_engine('mysql+pymysql://root:toolbox@127.0.0.1:3306/PizzaShop', echo=True)
@@ -102,8 +102,18 @@ def login(username:str, password:str):
             print("User not found! Please create an account!")
             return None
 
-#def applyDiscount(user, order):
+def generate_discount_code() -> int:
+    
 
+def check_birthday(birthday:DateTime):
+    with engine.connect() as conn:
+
+        birthday_check = conn.execute(
+            select(Customer).where(Customer.birthday == THE CURRENT DATE)
+        ).fetchone()
+
+        if birthday_check:
+            
 
 
 
