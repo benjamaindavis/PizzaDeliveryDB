@@ -68,3 +68,9 @@ def check_birthday(birthday:DateTime):
         ).fetchone()
 
         if birthday_check:
+
+
+
+
+
+#Base.metadata.create_all(engine)

@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, insert, DateTime, select
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.types import Boolean
 from decimal import Decimal
 from sqlalchemy.orm import declarative_base
@@ -22,6 +22,7 @@ class Discount(Base):
     discount_id = Column(Integer, primary_key = True, autoincrement = True)
     discount_code = Column(Integer)
     discount_type = Column(String(10))
+    discount_used = Column(Boolean)
 
 class Pizza(Base):
     __tablename__ = 'pizza'
