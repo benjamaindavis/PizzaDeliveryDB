@@ -96,6 +96,15 @@ class PizzaIngredients(Base):
     pizza_id = Column(Integer, ForeignKey('pizza.pizza_id'), primary_key=True, autoincrement=True)
     ingredients_id = Column(Integer, ForeignKey('ingredients.ingredients_id'), primary_key=True, autoincrement=True)
 
+class DeliveryPersonnel(Base):
+    __tablename__ = 'delivery_personnel'
+
+    personnel_id = Column(Integer, primary_key=True, autoincrement=True)
+    full_name = Column(String(50), nullable=False)
+    postal_code_assigned = Column(String(10), nullable=False)  # Assigned area of delivery
+    is_available = Column(Boolean, default=True)  # Whether the person is available for delivery
+    next_available_time = Column(DateTime, nullable=True)  # When they'll be available next
+
 
 #ADDING STUFF INTO THE TABLES
 #----------------------------
