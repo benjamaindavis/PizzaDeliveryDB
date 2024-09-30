@@ -66,7 +66,7 @@ class Order(Base):
     customer_id = Column(Integer, ForeignKey('customer.customer_id'))
     order_total = Column(Decimal(7,2))
     delivery_address = Column(String(50))
-    #cancel_time = Column()
+    cancel_time = Column(Boolean) # bool for ease of checking if the customer wants to cancel (5 min limit)
     delivery_time_minutes = Column(Integer)
 
 class OrderPizza(Base):
@@ -95,6 +95,12 @@ class PizzaIngredients(Base):
 
     pizza_id = Column(Integer, ForeignKey('pizza.pizza_id'), primary_key=True, autoincrement=True)
     ingredients_id = Column(Integer, ForeignKey('ingredients.ingredients_id'), primary_key=True, autoincrement=True)
+
+
+#ADDING STUFF INTO THE TABLES
+#----------------------------
+
+
 
             
 
