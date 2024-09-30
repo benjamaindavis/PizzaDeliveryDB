@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, insert, select, DateTime, update
-from main.java.org.example.TABLES.tables import Base, Customers, Order, Drinks, Desserts, Pizza
+from main.java.org.example.TABLES.tables import Base, Customers, Order, Drinks, Pizza
 from datetime import datetime
 from decimal import Decimal
 import random, string
@@ -11,8 +11,37 @@ def generate_discount_code(length = 10) -> str: # add a discount code delete fun
     discount_code = ''.join(random.choice(characters)for _ in range(length))
     return discount_code
 
-def code_validity_checker():
-    pass
+def add_discount_code(customer_id: int):
+    with engine.connect() as conn:
+        customer_check = conn.execute(
+            select(Customers.c.pizza_discount_code, Customers.c.pizza_count)
+            .where(Customers.c.customer_id == customer_id)
+        ).fetchone()
+
+        
+        if customer_check is not None:
+            pizza_discount_code = customer_check.pizza_discount_code
+            pizza_count = customer_check.pizza_count
+            
+            if check_pizza_count(customer_id) and pizza_discount_code is None:
+                # Generate a discount code
+                discount_code = generate_discount_code()
+
+                # Update the pizza_discount_code field in the customer record
+                stmt = (
+                    update(Customers)
+                    .where(Customers.c.customer_id == customer_id)
+                    .values(pizza_discount_code=discount_code)
+                )
+                conn.execute(stmt)
+                conn.commit()
+
+                #return f"Discount code {discount_code} added to customer {customer_id}"
+
+            elif pizza_discount_code is not None:
+                return f"Customer {customer_id} already has a discount code: {pizza_discount_code}"
+
+        return f"Customer {customer_id} is not eligible for a discount code at this time."
 
 def check_birthday(customer_id: int) -> bool:
     with engine.connect() as conn:
@@ -35,9 +64,9 @@ def check_pizza_count(customer_id: int) -> bool:
             select(Customers).where(Customers.customer_id == customer_id)
         ).fetchone()
 
-        if pizza_count_check:
-            pizza_count = pizza_count_check.pizza_count
-
+        if pizza_count_check is not None:
+            pizza_count = pizza_count_check[0]  # Access the pizza_count field
+            
             return pizza_count % 10 == 0
         
     return False

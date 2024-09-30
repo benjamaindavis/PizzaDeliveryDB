@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, create_engine
+from sqlalchemy import Column, Integer, String, DateTime, create_engine, ForeignKey
 from sqlalchemy.types import Boolean
 from decimal import Decimal
 from sqlalchemy.orm import declarative_base
@@ -16,7 +16,7 @@ class Customers(Base): # DROP TABLE IF EXISTS, use later if new column is needed
     birthday = Column(DateTime) # for discounts
     pizza_count = Column(Integer) # for discounts
     postal_code = Column(String(10)) # for data ig...
-    #add pizza_count code, make null if nothign is in there
+    pizza_discount_code = Column(String(10), nullable = True)
 
 
 class Discount(Base):
@@ -63,10 +63,38 @@ class Order(Base):
     __tablename__ = 'order'
 
     order_id = Column(Integer, primary_key = True, autoincrement = True)
+    customer_id = Column(Integer, ForeignKey('customer.customer_id'))
     order_total = Column(Decimal(7,2))
     delivery_address = Column(String(50))
     #cancel_time = Column()
     delivery_time_minutes = Column(Integer)
+
+class OrderPizza(Base):
+    __tablename__ = 'orderpizza'
+
+    order_id = Column(Integer, ForeignKey('order.order_id'), primary_key=True, autoincrement=True)
+    pizza_id = Column(Integer, ForeignKey('pizza.pizza_id'), primary_key=True, autoincrement=True)
+    pizza_amount = Column(Integer)
+
+class OrderDrink(Base):
+    __tablename__ = 'orderdrink'
+
+    order_id = Column(Integer, ForeignKey('order.order_id'), primary_key=True, autoincrement=True)
+    drink_id = Column(Integer, ForeignKey('drink.drink_id'), primary_key=True, autoincrement=True)
+    drink_amount = Column(Integer)
+
+class OrderDessert(Base):
+    __tablename__ = 'orderdessert'
+
+    order_id = Column(Integer, ForeignKey('order.order_id'), primary_key=True, autoincrement=True)
+    dessert_id = Column(Integer, ForeignKey('dessert.dessert_id'), primary_key=True, autoincrement=True)
+    dessert_amount = Column(Integer)
+
+class PizzaIngredients(Base):
+    __tablename__ = 'pizzaingredients'
+
+    pizza_id = Column(Integer, ForeignKey('pizza.pizza_id'), primary_key=True, autoincrement=True)
+    ingredients_id = Column(Integer, ForeignKey('ingredients.ingredients_id'), primary_key=True, autoincrement=True)
 
             
 
