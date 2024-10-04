@@ -1,100 +1,94 @@
-from sqlalchemy import Column, Integer, String, DateTime, create_engine, ForeignKey
-from sqlalchemy.types import Boolean
-from decimal import Decimal
+from sqlalchemy import Column, Integer, String, DateTime, create_engine, ForeignKey, insert
+from sqlalchemy.types import Boolean, Numeric
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 engine = create_engine('mysql+pymysql://root:toolbox@127.0.0.1:3306/PizzaShop', echo=True)
 
-class Customers(Base): # DROP TABLE IF EXISTS, use later if new column is needed
+class Customers(Base): 
     __tablename__ = 'customers'
     
-    customer_id = Column(Integer, primary_key = True, autoincrement = True)
-    full_name = Column(String(50))# identification...
-    username = Column(String(50), unique = True)# login info
-    password = Column(String(100))# LONGER FOR HASHING
-    birthday = Column(DateTime) # for discounts
-    pizza_count = Column(Integer) # for discounts
-    postal_code = Column(String(10)) # for data ig...
-    pizza_discount_code = Column(String(10), nullable = True)
-
+    customer_id = Column(Integer, primary_key=True, autoincrement=True)
+    full_name = Column(String(50))  # Identification
+    username = Column(String(50), unique=True)  # Login info
+    password = Column(String(100))  # Longer for hashing
+    birthday = Column(DateTime)  # For discounts
+    pizza_count = Column(Integer)  # For discounts
+    postal_code = Column(String(10))  # Address data
+    pizza_discount_code = Column(String(10), nullable=True)  # Optional discount code
 
 class Discount(Base):
     __tablename__ = 'discounts'
 
-    discount_id = Column(Integer, primary_key = True, autoincrement = True)
+    discount_id = Column(Integer, primary_key=True, autoincrement=True)
     discount_code = Column(Integer)
     discount_type = Column(String(10))
     discount_used = Column(Boolean)
 
-class Pizza(Base):
+class Pizza(Base): # no more vegan or vegetarian options
     __tablename__ = 'pizza'
 
-    pizza_id = Column(Integer, primary_key = True, autoincrement = True)
+    pizza_id = Column(Integer, primary_key=True, autoincrement=True)
     pizza_name = Column(String(50))
-    pizza_price = Column(Decimal(5,2))
-    vegetarian = Column(Boolean)
-    vegan = Column(Boolean)
+    pizza_price = Column(Numeric(5, 2))
 
 class Drinks(Base):
     __tablename__ = 'drinks'
 
-    drink_id = Column(Integer, primary_key = True, autoincrement = True)
-    drink_type = Column(String(50), unique = True)
-    drink_cost = Column(Decimal(5,2))
+    drink_id = Column(Integer, primary_key=True, autoincrement=True)
+    drink_type = Column(String(50), unique=True)
+    drink_cost = Column(Numeric(5, 2))
 
 class Desserts(Base):
     __tablename__ = 'desserts'
 
-    dessert_id = Column(Integer, primary_key = True, autoincrement = True)
-    dessert_type = Column(String(50), unique = True)
-    dessert_cost = Column(Decimal(5,2))
+    dessert_id = Column(Integer, primary_key=True, autoincrement=True)
+    dessert_type = Column(String(50), unique=True)
+    dessert_cost = Column(Numeric(5, 2))
 
-class Ingredients(Base):
+class Ingredients(Base): # no more vegan/ vegetarian
     __tablename__ = 'ingredients'
 
-    ingredient_id = Column(Integer, primary_key = True, autoincrement = True)
+    ingredient_id = Column(Integer, primary_key=True, autoincrement=True)
     ingredient_name = Column(String(50))
-    ingredient_cost = Column(Decimal(5,2))
-    vegetarian = Column(Boolean)
-    vegan = Column(Boolean)
+    ingredient_cost = Column(Numeric(5, 2))
 
-class Order(Base):
-    __tablename__ = 'order'
+class CustomerOrder(Base):
+    __tablename__ = 'customerorder'
 
-    order_id = Column(Integer, primary_key = True, autoincrement = True)
-    customer_id = Column(Integer, ForeignKey('customer.customer_id'))
-    order_total = Column(Decimal(7,2))
+    order_id = Column(Integer, primary_key=True, autoincrement=True)
+    customer_id = Column(Integer, ForeignKey('customers.customer_id'))
+    order_total = Column(Numeric(7, 2))
     delivery_address = Column(String(50))
-    cancel_time = Column(Boolean) # bool for ease of checking if the customer wants to cancel (5 min limit)
+    cancel_time = Column(Boolean)  # True if customer cancels (5 min limit)
     delivery_time_minutes = Column(Integer)
 
 class OrderPizza(Base):
     __tablename__ = 'orderpizza'
 
-    order_id = Column(Integer, ForeignKey('order.order_id'), primary_key=True, autoincrement=True)
-    pizza_id = Column(Integer, ForeignKey('pizza.pizza_id'), primary_key=True, autoincrement=True)
+    order_id = Column(Integer, ForeignKey('customerorder.order_id'), primary_key=True)
+    pizza_id = Column(Integer, ForeignKey('pizza.pizza_id'), primary_key=True)
     pizza_amount = Column(Integer)
 
 class OrderDrink(Base):
     __tablename__ = 'orderdrink'
 
-    order_id = Column(Integer, ForeignKey('order.order_id'), primary_key=True, autoincrement=True)
-    drink_id = Column(Integer, ForeignKey('drink.drink_id'), primary_key=True, autoincrement=True)
+    order_id = Column(Integer, ForeignKey('customerorder.order_id'), primary_key=True)
+    drink_id = Column(Integer, ForeignKey('drinks.drink_id'), primary_key=True)
     drink_amount = Column(Integer)
 
 class OrderDessert(Base):
     __tablename__ = 'orderdessert'
 
-    order_id = Column(Integer, ForeignKey('order.order_id'), primary_key=True, autoincrement=True)
-    dessert_id = Column(Integer, ForeignKey('dessert.dessert_id'), primary_key=True, autoincrement=True)
+    order_id = Column(Integer, ForeignKey('customerorder.order_id'), primary_key=True)
+    dessert_id = Column(Integer, ForeignKey('desserts.dessert_id'), primary_key=True)
     dessert_amount = Column(Integer)
 
 class PizzaIngredients(Base):
     __tablename__ = 'pizzaingredients'
 
-    pizza_id = Column(Integer, ForeignKey('pizza.pizza_id'), primary_key=True, autoincrement=True)
-    ingredients_id = Column(Integer, ForeignKey('ingredients.ingredients_id'), primary_key=True, autoincrement=True)
+    pizza_id = Column(Integer, ForeignKey('pizza.pizza_id'), primary_key=True)
+    ingredient_id = Column(Integer, ForeignKey('ingredients.ingredient_id'), primary_key=True)
 
 class DeliveryPersonnel(Base):
     __tablename__ = 'delivery_personnel'
@@ -104,26 +98,57 @@ class DeliveryPersonnel(Base):
     postal_code_assigned = Column(String(10), nullable=False)  # Assigned area of delivery
     is_available = Column(Boolean, default=True)  # Whether the person is available for delivery
     next_available_time = Column(DateTime, nullable=True)  # When they'll be available next
-
-
-#ADDING STUFF INTO THE TABLES
-#----------------------------
-
-
-
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#---------------------------------------
 Base.metadata.create_all(engine)
+
+with engine.connect() as conn:
+    conn.execute(
+        insert(Pizza),
+        [
+            {'pizza_name': 'Marry Me Margherita', "pizza_price": 9.99},
+            {'pizza_name': 'Perfect Pepperoni', "pizza_price": 10.99},
+            {'pizza_name': 'Voluptuous Vegetarian', "pizza_price": 8.99},
+            {'pizza_name': 'Angsty Anchovie', "pizza_price": 9.99},
+            {'pizza_name': 'Sizzling Salami', "pizza_price": 10.99},
+            {'pizza_name': 'Meatlovers', "pizza_price": 12.99},
+            {'pizza_name': 'Kiss of the Sea', "pizza_price": 11.99},
+            {'pizza_name': 'Voluptuous Vegetarian', "pizza_price": 8.99},
+            {'pizza_name': 'Angsty Anchovie', "pizza_price": 9.99},
+            {'pizza_name': 'Sizzling Salami', "pizza_price": 10.99},
+        ]
+    )
+    conn.execute(
+        insert(Desserts),
+        [
+            {'dessert_type': 'Tiramisu', "dessert_cost": 4.99},
+            {'dessert_type': 'Canoli', "dessert_cost": 5.99},
+        ]
+    )
+    conn.execute(
+        insert(Drinks),
+        [
+            {'drink_type': 'Water', "drink_cost": 2.99},
+            {'drink_type': 'Coca Cola', "drink_cost": 3.99},
+            {'drink_type': 'Pepsi', "drink_cost": 3.98},
+            {'drink_type': 'Chocolate Milk', "drink_cost": 3.50},
+            {'drink_type': 'Fanta', "drink_cost": 3.97},
+        ]
+    )
+    conn.execute(
+        insert(Ingredients),
+        [
+            {'ingredient_name': 'Cheese', "ingredient_cost": 1.99},
+            {'ingredient_name': 'Pineapple', "ingredient_cost": 1.99},
+            {'ingredient_name': 'Anchovies', "ingredient_cost": 1.99},
+            {'ingredient_name': 'Pepperoni', "ingredient_cost": 1.99},
+            {'ingredient_name': 'Salami', "ingredient_cost": 1.99},
+            {'ingredient_name': 'Mushrooms', "ingredient_cost": 1.50},
+            {'ingredient_name': 'Peppers', "ingredient_cost": 1.50},
+            {'ingredient_name': 'Red Onions', "ingredient_cost": 1.50},
+            {'ingredient_name': 'Onions', "ingredient_cost": 1.50},
+            {'ingredient_name': 'Jalapenos', "ingredient_cost": 1.50},
+        ]
+    )
+    conn.commit()
+
+
