@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, insert, select, DateTime
-from main.java.org.example.TABLES.tables import Base, Customer
+from DISCOUNTS.tables import Customers
 import bcrypt
 
 engine = create_engine('mysql+pymysql://root:toolbox@127.0.0.1:3306/PizzaShop', echo=True)
@@ -15,7 +15,7 @@ class signUp:
         with engine.connect() as conn:
             
             existing_user = conn.execute(
-                select(Customer).where(Customer.username == username)
+                select(Customers).where(Customers.username == username)
             ).fetchone()
 
             if existing_user:
@@ -23,7 +23,7 @@ class signUp:
                 return None
 
             # insert new customer
-            conn.execute(insert(Customer).values(
+            conn.execute(insert(Customers).values(
                 full_name = full_name,
                 username = username,
                 password = hashed_password,
@@ -37,4 +37,3 @@ class signUp:
             print("Signup successful!")
 
 
-    

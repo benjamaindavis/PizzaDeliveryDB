@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from TABLES.tables import DeliveryPersonnel, CustomerOrder  # Assuming the correct path is 'tables'
+from DISCOUNTS.tables import DeliveryPersonnel, CustomerOrder  # Assuming the correct path is 'tables'
 from sqlalchemy import func
 
 class DeliveryManagement: 

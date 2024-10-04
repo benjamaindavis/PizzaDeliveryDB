@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from src.main.java.org.example.TABLES.tables import Base, Order, DeliveryPersonnel  # Assuming your models are in 'models.py'
+from DISCOUNTS.tables import Base, Order, DeliveryPersonnel  # Assuming your models are in 'models.py'
 from DeliveryManagement import DeliveryManagement  # Import the separate class
 
 # Database setup

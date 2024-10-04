@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, insert, select, DateTime, update, or_
-from TABLES.tables import Base, Customers, Order, Drinks, Pizza, OrderDrink, Discount
+from DISCOUNTS.tables import Base, Customers, Order, Drinks, Pizza, OrderDrink, Discount
 from datetime import datetime
 from decimal import Decimal
 import random, string

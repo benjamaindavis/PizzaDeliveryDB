@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, insert, select
-from main.java.org.example.TABLES.tables import Base, Customer
+from DISCOUNTS.tables import Customers
 import bcrypt
 
 engine = create_engine('mysql+pymysql://root:toolbox@127.0.0.1:3306/PizzaShop', echo=True)
@@ -16,7 +16,7 @@ class login:
         with engine.connect() as conn:
             #fetch user by username
             user_record = conn.execute(
-                select(Customer).where(Customer.username == username)
+                select(Customers).where(Customers.username == username)
             ).fetchone()
 
             if user_record:

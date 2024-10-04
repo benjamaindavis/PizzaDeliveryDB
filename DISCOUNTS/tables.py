@@ -103,7 +103,7 @@ Base.metadata.create_all(engine)
 
 with engine.connect() as conn:
     conn.execute(
-        insert(Pizza),
+        insert(Pizza),#change this IMMEDIATELY
         [
             {'pizza_name': 'Marry Me Margherita', "pizza_price": 9.99},
             {'pizza_name': 'Perfect Pepperoni', "pizza_price": 10.99},
