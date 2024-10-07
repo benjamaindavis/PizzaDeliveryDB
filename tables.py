@@ -150,5 +150,3 @@ with engine.connect() as conn:
         ]
     )
     conn.commit()
-
-

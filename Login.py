@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, insert, select
-from DISCOUNTS.tables import Customers
+from TABLES.tables import Customers
 import bcrypt
 
 engine = create_engine('mysql+pymysql://root:toolbox@127.0.0.1:3306/PizzaShop', echo=True)
